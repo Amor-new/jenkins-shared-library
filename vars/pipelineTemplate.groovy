@@ -70,8 +70,9 @@ def call(Map config = [:]) {
             sh """
             export KUBECONFIG=$KUBECONFIG_FILE
             kubectl config get-contexts
-            kubectl set image deployment/tojuresto tojuresto=${config.imageName}:${IMAGE_TAG}
-            kubectl rollout status deployment/tojuresto
+            kubectl set image deployment/tojuresto tojuresto=${config.imageName}:${IMAGE_TAG} --insecure-skip-tls-verify
+            kubectl rollout status deployment/tojuresto --insecure-skip-tls-verify
+
             """
         }
         }
