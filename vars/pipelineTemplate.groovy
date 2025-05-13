@@ -65,12 +65,17 @@ def call(Map config = [:]) {
                   '
                 """
               }
-            } else if (config.deployTarget == 'k8s') {
-              sh """
-                kubectl set image deployment/tojuresto tojuresto=${config.imageName}:${IMAGE_TAG}
-                kubectl rollout status deployment/tojuresto
-              """
-            }
+                    } else if (config.deployTarget == 'k8s') {
+        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+            sh """
+            export KUBECONFIG=$KUBECONFIG_FILE
+            kubectl config get-contexts
+            kubectl set image deployment/tojuresto tojuresto=${config.imageName}:${IMAGE_TAG}
+            kubectl rollout status deployment/tojuresto
+            """
+        }
+        }
+
           }
         }
       }
