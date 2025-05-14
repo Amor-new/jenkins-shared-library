@@ -51,7 +51,7 @@ def call(Map config = [:]) {
         }
       }
 
-      stage('Deploy') {
+            stage('Deploy') {
         steps {
           script {
             if (config.deployTarget == 'docker-compose') {
@@ -65,21 +65,21 @@ def call(Map config = [:]) {
                   '
                 """
               }
-                    } else if (config.deployTarget == 'k8s') {
-        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
-            sh """
-            export KUBECONFIG=$KUBECONFIG_FILE
-            kubectl config get-contexts
-            kubectl set image deployment/tojuresto tojuresto=${config.imageName}:${IMAGE_TAG} --insecure-skip-tls-verify
-            kubectl rollout status deployment/tojuresto --insecure-skip-tls-verify
-
-            """
-        }
-        }
-
+            } else if (config.deployTarget == 'k8s') {
+              sshagent(['vm-ssh-cred-id']) {
+                sh """
+                  ssh -o StrictHostKeyChecking=no amor@192.168.176.135 '
+                    export KUBECONFIG=/home/amor/.kube/config &&
+                    kubectl set image deployment/tojuresto tojuresto=${config.imageName}:${IMAGE_TAG} &&
+                    kubectl rollout status deployment/tojuresto
+                  '
+                """
+              }
+            }
           }
         }
       }
+
     }
   }
 }
