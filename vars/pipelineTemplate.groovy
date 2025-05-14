@@ -61,7 +61,7 @@ def call(Map config = [:]) {
                     docker pull ${config.imageName}:${IMAGE_TAG} &&
                     docker stop landing-container || true &&
                     docker rm landing-container || true &&
-                    docker run -d --name landing-container -p 80:80 ${config.imageName}:${IMAGE_TAG}
+                    docker run -d --name landing-container -p 80:8000 ${config.imageName}:${IMAGE_TAG}
                   '
                 """
               }
